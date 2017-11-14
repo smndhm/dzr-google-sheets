@@ -6,6 +6,7 @@ Easily get a Deezer ID
 ### Simple, Basique
 
 `=DZR_SEARCH("Orelsan")` will return the first result ID: [414838212](https://www.deezer.com/artist/414838212)
+
 But the result can be an artist, track, or album ID.
 
 ### Closer
