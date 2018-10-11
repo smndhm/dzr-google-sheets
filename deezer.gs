@@ -17,11 +17,11 @@ function DZR_SEARCH(search, type, responseKey) {
 
 //SEARCH Type  
   var types = ['album', 'artist', 'playlist', 'podcast', 'radio', 'track', 'user'];
-  var searchType = type || '';
-  searchType = searchType.trim().toLowerCase();
+  var typeId = type || '';
+  typeId = typeId.trim().toLowerCase();
   
 //SEARCH Call
-  var searchURL = 'https://api.deezer.com/search' + ( types.indexOf(searchType) !== -1 ? '/' + searchType : '' ) + '?q=' + encodeURIComponent( searchTerm );  
+  var searchURL = 'https://api.deezer.com/search' + ( types.indexOf(typeId) !== -1 ? '/' + typeId : '' ) + '?q=' + encodeURIComponent( searchTerm );  
   var jsonText = UrlFetchApp.fetch(searchURL).getContentText();
   
 //RESPONSE
@@ -44,6 +44,57 @@ function DZR_SEARCH(search, type, responseKey) {
   
 }
 
+/**
+ * Get data from Deezer ID
+ *
+ * @deezer_id {integer} Deezer ID
+ * @type {string} type ID (album, artist, playlist, podcast, radio, track, user, upc).
+ * @responseKey {string} Select response (link, nb_fan, nb_album, etc... default: id).
+ * @return Deezer data
+ * @customfunction
+ */
+function DZR_ID(deezer_id, type, responseKey) {
+  
+//Deezer ID
+  var deezerId = parseInt(deezer_id) || 0;
+  
+  if ( deezerId === 0 ) throw "No Deezer Id";
+
+//Type ID
+  var types = ['album', 'artist', 'playlist', 'podcast', 'radio', 'track', 'user', 'upc'];
+  var typeId = type || '';
+  typeId = typeId.trim().toLowerCase();
+  
+  if ( typeId === '' ) throw "You must define a Deezer ID (album, artist, playlist, podcast, radio, track, user, UPC).";
+  else if ( types.indexOf(typeId) === -1 ) throw "Wrong type ID (album, artist, playlist, podcast, radio, track, user, UPC).";
+  
+//SEARCH Call
+  var searchURL = 'https://api.deezer.com/' + ( typeId === 'upc' ? 'album/upc:' : typeId + '/' ) + deezer_id;  
+  var jsonText = UrlFetchApp.fetch(searchURL).getContentText();
+  
+//RESPONSE
+  try {
+    
+    var json = JSON.parse(jsonText);
+    
+    if ( json.error ) throw json.error.message;
+    
+    var response = json[responseKey] || json['title'] || json['name'];
+    
+    return JSON.stringify(response).replace(/\"/g, "");
+    
+  } catch (e) {
+    
+    throw e;
+    
+  }
+  
+}
+
 function test_dzr_search () {
   return DZR_SEARCH('Lartiste');
+};
+
+function test_dzr_search () {
+  return DZR_ID(559269722);
 };
